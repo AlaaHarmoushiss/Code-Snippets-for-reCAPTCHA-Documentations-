@@ -1,0 +1,21 @@
+import React, { useEffect } from 'react';
+     import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+
+     const Login = () => {
+       const { executeRecaptcha } = useGoogleReCaptcha();
+
+       const handleLogin = async (event) => {
+         event.preventDefault();
+         const recaptchaToken = await executeRecaptcha('login');
+         // Add logic to submit login form with recaptchaToken
+       };
+
+       return (
+         <form onSubmit={handleLogin}>
+           {/* Your login form fields */}
+           <button type="submit">Login</button>
+         </form>
+       );
+     };
+
+     export default Login;
