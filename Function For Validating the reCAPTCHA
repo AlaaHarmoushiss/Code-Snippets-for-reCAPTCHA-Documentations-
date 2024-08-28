@@ -1,0 +1,12 @@
+const axios = require('axios');
+
+   const verifyRecaptcha = async (recaptchaToken) => {
+     try {
+       const secretKey = 'YOUR_RECAPTCHA_SECRET_KEY';
+       const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaToken}`);
+       return response.data.success;
+     } catch (error) {
+       console.error('Error verifying reCAPTCHA:', error);
+       return false;
+     }
+   };
