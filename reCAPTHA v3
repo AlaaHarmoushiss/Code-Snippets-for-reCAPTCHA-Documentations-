@@ -1,21 +1,75 @@
-import React, { useEffect } from 'react';
-     import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
-     const Login = () => {
-       const { executeRecaptcha } = useGoogleReCaptcha();
+const LoginPage = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
-       const handleLogin = async (event) => {
-         event.preventDefault();
-         const recaptchaToken = await executeRecaptcha('login');
-         // Add logic to submit login form with recaptchaToken
-       };
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-       return (
-         <form onSubmit={handleLogin}>
-           {/* Your login form fields */}
-           <button type="submit">Login</button>
-         </form>
-       );
-     };
+    if (!executeRecaptcha) {
+      alert('reCAPTCHA is not loaded');
+      return;
+    }
 
-     export default Login;
+    try {
+      const recaptchaToken = await executeRecaptcha('login'); // Execute reCAPTCHA for 'login' action
+
+      const response = await fetch('YOUR_LOGIN_ENDPOINT', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          recaptchaToken, // Send reCAPTCHA token with the login request
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        navigate('/News'); // Redirect on successful login
+      } else {
+        alert('Authentication failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
+    }
+  };
+
+  return (
+    <div>
+      <h2>Login Page</h2>
+      <form onSubmit={handleLogin}>
+        <div>
+          <label>Username:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  );
+};
