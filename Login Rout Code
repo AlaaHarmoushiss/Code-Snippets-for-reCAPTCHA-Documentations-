@@ -1,21 +1,31 @@
 const express = require('express');
-   const app = express();
-   const { verifyRecaptcha } = require('./recaptcha'); // Ensure this points to your recaptcha file
+const app = express();
+const { verifyRecaptcha } = require('./recaptcha'); // Ensure this points to your recaptcha file
 
-   app.post('/auth', async (req, res) => {
-     const { username, password, recaptchaToken } = req.body;
+app.use(express.json());
 
-     const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
-     if (!isRecaptchaValid) {
-       return res.status(400).json({ message: 'reCAPTCHA validation failed. Please try again.' });
-     }
+app.post('/auth', async (req, res) => {
+  const { username, password, recaptchaToken } = req.body;
 
-     // Proceed with your authentication logic
-     // Authenticate the user with Active Directory or your database
+  // Verify reCAPTCHA token
+  const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+  if (!isRecaptchaValid) {
+    return res.status(400).json({ message: 'reCAPTCHA validation failed. Please try again.' });
+  }
 
-     res.json({ message: 'Login successful!' });
-   });
+   //Proceed with your authentication logic
+   //Authenticate the user with Active Directory or your database
+   Example:
+   const user = await authenticateUser(username, password);
+   if (user) {
+     return res.json({ message: 'Login successful!' });
+   } else {
+    return res.status(401).json({ message: 'Authentication failed. Please check your credentials.' });
+   }
 
-   app.listen(5000, () => {
-     console.log('Server running on port 5000');
-   });
+  res.json({ message: 'Login successful!' });
+});
+
+app.listen(5000, () => {
+  console.log('Server running on port 5000');
+});
