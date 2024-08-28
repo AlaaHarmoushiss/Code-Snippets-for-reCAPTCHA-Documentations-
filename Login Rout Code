@@ -1,0 +1,21 @@
+const express = require('express');
+   const app = express();
+   const { verifyRecaptcha } = require('./recaptcha'); // Ensure this points to your recaptcha file
+
+   app.post('/auth', async (req, res) => {
+     const { username, password, recaptchaToken } = req.body;
+
+     const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+     if (!isRecaptchaValid) {
+       return res.status(400).json({ message: 'reCAPTCHA validation failed. Please try again.' });
+     }
+
+     // Proceed with your authentication logic
+     // Authenticate the user with Active Directory or your database
+
+     res.json({ message: 'Login successful!' });
+   });
+
+   app.listen(5000, () => {
+     console.log('Server running on port 5000');
+   });
